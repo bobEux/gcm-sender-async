@@ -44,9 +44,12 @@ public class GcmRequestEntity {
   @JsonProperty
   private String priority;
 
+  @JsonProperty(value = "notification")
+  private Map<String, String> notification;
+
   public GcmRequestEntity(String collapseKey, Long ttl, Boolean delayWhileIdle,
                           Map<String, String> data, List<String> registrationIds,
-                          String priority)
+                          String priority, Map<String, String> notification)
   {
     this.collapseKey     = collapseKey;
     this.ttl             = ttl;
@@ -54,5 +57,6 @@ public class GcmRequestEntity {
     this.data            = data;
     this.registrationIds = registrationIds;
     this.priority        = priority;
+    this.notification    = notification;
   }
 }

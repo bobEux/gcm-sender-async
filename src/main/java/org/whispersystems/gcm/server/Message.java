@@ -35,10 +35,11 @@ public class Message {
   private final Map<String, String> data;
   private final List<String>        registrationIds;
   private final String              priority;
+  private final Map<String, String> notification;
 
   private Message(String collapseKey, Long ttl, Boolean delayWhileIdle,
                   Map<String, String> data, List<String> registrationIds,
-                  String priority)
+                  String priority, Map<String, String> notification)
   {
     this.collapseKey     = collapseKey;
     this.ttl             = ttl;
@@ -46,11 +47,12 @@ public class Message {
     this.data            = data;
     this.registrationIds = registrationIds;
     this.priority        = priority;
+    this.notification    = notification;
   }
 
   public String serialize() throws JsonProcessingException {
     GcmRequestEntity requestEntity = new GcmRequestEntity(collapseKey, ttl, delayWhileIdle,
-                                                          data, registrationIds, priority);
+                                                          data, registrationIds, priority, notification);
 
     return objectMapper.writeValueAsString(requestEntity);
   }
@@ -71,6 +73,7 @@ public class Message {
     private Map<String, String> data            = null;
     private List<String>        registrationIds = new LinkedList<>();
     private String              priority        = null;
+    private Map<String, String> notification    = null;
 
     private Builder() {}
 
@@ -139,6 +142,20 @@ public class Message {
     }
 
     /**
+     * Set a key in the GCM JSON notification payload delivered to the application (optional).
+     * @param key The key to set.
+     * @param value The value to set.
+     * @return The Builder.
+     */
+    public Builder withNotificationPart(String key, String value) {
+      if (notification == null) {
+        notification = new HashMap<>();
+      }
+      notification.put(key, value);
+      return this;
+    }
+
+    /**
      * Construct a message object.
      *
      * @return An immutable message object, as configured by this builder.
@@ -148,9 +165,9 @@ public class Message {
         throw new IllegalArgumentException("You must specify a destination!");
       }
 
-      return new Message(collapseKey, ttl, delayWhileIdle, data, registrationIds, priority);
+      return new Message(collapseKey, ttl, delayWhileIdle, data, registrationIds, priority, notification);
     }
-  }
 
+  }
 
 }
