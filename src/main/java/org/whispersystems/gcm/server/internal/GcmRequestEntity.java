@@ -27,7 +27,13 @@ import java.util.Map;
 public class GcmRequestEntity {
 
   @JsonProperty(value = "collapse_key")
-  private String collapseKey;
+  private String collapseKeyLegacy;
+
+  @JsonProperty(value = "collapseKey")
+  private String collapseKeyAndroid;
+
+  @JsonProperty(value = "apns-collapse-id")
+  private String collapseKeyApn;
 
   @JsonProperty(value = "time_to_live")
   private Long ttl;
@@ -51,7 +57,7 @@ public class GcmRequestEntity {
                           Map<String, String> data, List<String> registrationIds,
                           String priority, Map<String, String> notification)
   {
-    this.collapseKey     = collapseKey;
+    this.collapseKeyLegacy = this.collapseKeyAndroid = this.collapseKeyApn = collapseKey;
     this.ttl             = ttl;
     this.delayWhileIdle  = delayWhileIdle;
     this.data            = data;
