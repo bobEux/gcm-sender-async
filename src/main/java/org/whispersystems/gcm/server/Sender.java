@@ -50,7 +50,7 @@ import java.util.concurrent.TimeoutException;
  */
 public class Sender {
 
-  private static final String PRODUCTION_URL = "https://android.googleapis.com/gcm/send";
+  private static final String PRODUCTION_URL = "https://fcm.googleapis.com/fcm/send";
 
   private final CloseableHttpAsyncClient client;
   private final String                   authorizationHeader;
