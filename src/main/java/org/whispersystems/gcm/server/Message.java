@@ -36,10 +36,12 @@ public class Message {
   private final List<String>        registrationIds;
   private final String              priority;
   private final Map<String, String> notification;
+  private final Map<String, String> apns;
 
   private Message(String collapseKey, Long ttl, Boolean delayWhileIdle,
                   Map<String, String> data, List<String> registrationIds,
-                  String priority, Map<String, String> notification)
+                  String priority, Map<String, String> notification,
+                  Map<String, String> apns)
   {
     this.collapseKey     = collapseKey;
     this.ttl             = ttl;
@@ -48,11 +50,12 @@ public class Message {
     this.registrationIds = registrationIds;
     this.priority        = priority;
     this.notification    = notification;
+    this.apns    = apns;
   }
 
   public String serialize() throws JsonProcessingException {
     GcmRequestEntity requestEntity = new GcmRequestEntity(collapseKey, ttl, delayWhileIdle,
-                                                          data, registrationIds, priority, notification);
+                                                          data, registrationIds, priority, notification, apns);
 
     return objectMapper.writeValueAsString(requestEntity);
   }
@@ -74,6 +77,7 @@ public class Message {
     private List<String>        registrationIds = new LinkedList<>();
     private String              priority        = null;
     private Map<String, String> notification    = null;
+    private Map<String, String> apns    = null;
 
     private Builder() {}
 
@@ -155,6 +159,21 @@ public class Message {
       return this;
     }
 
+
+    /**
+     * Set a key in the GCM JSON APNS (Apple Push Notification Service) payload delivered to the application (optional).
+     * @param key The key to set.
+     * @param value The value to set.
+     * @return The Builder.
+     */
+    public Builder withApnsPart(String key, String value) {
+      if (apns == null) {
+        apns = new HashMap<>();
+      }
+      apns.put(key, value);
+      return this;
+    }
+
     /**
      * Construct a message object.
      *
@@ -165,7 +184,7 @@ public class Message {
         throw new IllegalArgumentException("You must specify a destination!");
       }
 
-      return new Message(collapseKey, ttl, delayWhileIdle, data, registrationIds, priority, notification);
+      return new Message(collapseKey, ttl, delayWhileIdle, data, registrationIds, priority, notification, apns);
     }
 
   }

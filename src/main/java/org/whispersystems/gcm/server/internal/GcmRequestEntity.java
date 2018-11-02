@@ -30,10 +30,7 @@ public class GcmRequestEntity {
   private String collapseKeyLegacy;
 
   @JsonProperty(value = "collapseKey")
-  private String collapseKeyAndroid;
-
-  @JsonProperty(value = "apns-collapse-id")
-  private String collapseKeyApn;
+  private String collapseKey;
 
   @JsonProperty(value = "time_to_live")
   private Long ttl;
@@ -53,16 +50,20 @@ public class GcmRequestEntity {
   @JsonProperty(value = "notification")
   private Map<String, String> notification;
 
+  @JsonProperty(value = "apns")
+  private Map<String, String> apns;
+
   public GcmRequestEntity(String collapseKey, Long ttl, Boolean delayWhileIdle,
                           Map<String, String> data, List<String> registrationIds,
-                          String priority, Map<String, String> notification)
+                          String priority, Map<String, String> notification, Map<String, String> apns)
   {
-    this.collapseKeyLegacy = this.collapseKeyAndroid = this.collapseKeyApn = collapseKey;
+    this.collapseKeyLegacy = this.collapseKey = collapseKey;
     this.ttl             = ttl;
     this.delayWhileIdle  = delayWhileIdle;
     this.data            = data;
     this.registrationIds = registrationIds;
     this.priority        = priority;
     this.notification    = notification;
+    this.apns    = apns;
   }
 }
