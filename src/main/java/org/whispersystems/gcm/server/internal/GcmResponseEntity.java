@@ -20,17 +20,17 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class GcmResponseEntity {
 
-  @JsonProperty(value = "message_id")
-  private String messageId;
+  @JsonProperty
+  private String name;
 
   @JsonProperty(value = "registration_id")
   private String canonicalRegistrationId;
 
-  @JsonProperty
+  @JsonProperty(value = "error_code")
   private String error;
 
-  public String getMessageId() {
-    return messageId;
+  public String getName() {
+    return name;
   }
 
   public String getCanonicalRegistrationId() {

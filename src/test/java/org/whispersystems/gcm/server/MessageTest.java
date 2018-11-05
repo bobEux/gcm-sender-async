@@ -12,8 +12,10 @@ public class MessageTest {
   @Test
   public void testMinimal() throws IOException {
     Message message = Message.newBuilder()
-                             .withDestination("1")
-                             .build();
+                            .withDestination("1")
+                            .withNotificationPart("title", "title")
+                            .withNotificationPart("body", "body")
+                            .build();
 
     assertEquals(message.serialize(), jsonFixture("fixtures/message-minimal.json"));
   }
@@ -21,12 +23,10 @@ public class MessageTest {
   @Test
   public void testComplete() throws IOException {
     Message message = Message.newBuilder()
-                             .withDestination("1")
-                             .withCollapseKey("collapse")
-                             .withDelayWhileIdle(true)
-                             .withTtl(10)
-                             .withPriority("high")
-                             .build();
+                            .withDestination("1")
+                            .withNotificationPart("title", "title")
+                            .withNotificationPart("body", "body")
+                            .build();
 
     assertEquals(message.serialize(), jsonFixture("fixtures/message-complete.json"));
   }

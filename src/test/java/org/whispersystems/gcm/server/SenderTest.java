@@ -30,14 +30,18 @@ public class SenderTest {
 
     String                   context = "my context";
     Sender                   sender  = new Sender("foobarbaz", 10, server.getUrl("/gcm/send").toExternalForm());
-    ListenableFuture<Result> future  = sender.send(Message.newBuilder().withDestination("1").build(), context);
+    ListenableFuture<Result> future  = sender.send(Message.newBuilder()
+            .withNotificationPart("title", "title")
+            .withNotificationPart("body", "body")
+            .withDestination("1")
+            .build(), context);
 
     Result result = future.get(10, TimeUnit.SECONDS);
 
     assertEquals(result.isSuccess(), true);
     assertEquals(result.isThrottled(), false);
     assertEquals(result.isUnregistered(), false);
-    assertEquals(result.getMessageId(), "1:08");
+    assertEquals(result.getMessageId(), "message-id");
     assertNull(result.getError());
     assertNull(result.getCanonicalRegistrationId());
     assertEquals(context, result.getContext());
@@ -45,8 +49,8 @@ public class SenderTest {
     RecordedRequest request = server.takeRequest();
     assertEquals(request.getPath(), "/gcm/send");
     assertEquals(new String(request.getBody()), jsonFixture("fixtures/message-minimal.json"));
-    assertEquals(request.getHeader("Authorization"), "key=foobarbaz");
-    assertEquals(request.getHeader("Content-Type"), "application/json");
+    assertEquals(request.getHeader("Authorization"), "Bearer foobarbaz");
+    assertEquals(request.getHeader("Content-Type"), "application/json; UTF-8");
     assertEquals(server.getRequestCount(), 1);
   }
 
@@ -127,7 +131,7 @@ public class SenderTest {
     assertEquals(result.isSuccess(), true);
     assertEquals(result.isThrottled(), false);
     assertEquals(result.isUnregistered(), false);
-    assertEquals(result.getMessageId(), "1:08");
+    assertEquals(result.getMessageId(), "message-id");
     assertNull(result.getError());
     assertNull(result.getCanonicalRegistrationId());
   }
@@ -164,7 +168,9 @@ public class SenderTest {
     Sender                   sender = new Sender("foobarbaz", 2, server.getUrl("/gcm/send").toExternalForm());
     ListenableFuture<Result> future = sender.send(Message.newBuilder()
                                                          .withDestination("2")
-                                                         .withDataPart("message", "new message!")
+                                                         .withNotificationPart("title", "title")
+                                                         .withNotificationPart("body", "body")
+                                                         .withDataPart("key1", "value1")
                                                          .build());
 
     Result result = future.get(10, TimeUnit.SECONDS);
@@ -172,6 +178,6 @@ public class SenderTest {
     assertFalse(result.isSuccess());
     assertTrue(result.isUnregistered());
     assertFalse(result.isThrottled());
-    assertEquals(result.getError(), "NotRegistered");
+    assertEquals(result.getError(), "UNREGISTERED");
   }
 }
