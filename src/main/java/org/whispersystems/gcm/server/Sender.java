@@ -54,7 +54,6 @@ public class Sender {
   private static final String PRODUCTION_URL = "https://fcm.googleapis.com/fcm/send";
 
   private final CloseableHttpAsyncClient client;
-  private final String                   authorizationHeader;
   private final RetryExecutor            executor;
   private final String                   url;
   private       String                   apiKey;
@@ -81,8 +80,6 @@ public class Sender {
     ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
 
     this.url                 = url;
-    this.authorizationHeader = String.format("Bearer %s", this.apiKey);
-
     this.client = HttpAsyncClients.custom()
                                   .setMaxConnTotal(100)
                                   .setMaxConnPerRoute(10)
@@ -123,7 +120,7 @@ public class Sender {
         SettableFuture<Result> future  = SettableFuture.create();
         HttpPost               request = new HttpPost(url);
 
-        request.setHeader("Authorization", authorizationHeader);
+        request.setHeader("Authorization", String.format("Bearer %s", apiKey));
         request.setHeader("Content-Type", "application/json; UTF-8");
         request.setEntity(new StringEntity(message.serialize(),
                                            ContentType.parse("application/json")));
@@ -148,7 +145,7 @@ public class Sender {
    *
    * @param key apiKey.
    */
-  public void setApiToken(String key) {
+  public void setApiKey(String key) {
     this.apiKey = key;
   }
 

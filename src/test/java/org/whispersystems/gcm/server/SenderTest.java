@@ -30,7 +30,7 @@ public class SenderTest {
 
     String                   context = "my context";
     Sender                   sender  = new Sender(10, server.getUrl("/gcm/send").toExternalForm());
-    sender.setApiToken("foobarbaz");
+    sender.setApiKey("foobarbaz");
     ListenableFuture<Result> future  = sender.send(Message.newBuilder()
             .withNotificationPart("title", "title")
             .withNotificationPart("body", "body")
@@ -61,7 +61,7 @@ public class SenderTest {
     server.enqueue(unauthorizedResponse);
 
     Sender                   sender = new Sender( 10, server.getUrl("/gcm/send").toExternalForm());
-    sender.setApiToken("blabla");
+    sender.setApiKey("blabla");
     ListenableFuture<Result> future = sender.send(Message.newBuilder().withDestination("1").build());
 
     try {
