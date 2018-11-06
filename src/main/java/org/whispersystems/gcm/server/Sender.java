@@ -57,32 +57,31 @@ public class Sender {
   private final String                   authorizationHeader;
   private final RetryExecutor            executor;
   private final String                   url;
+  private       String                   apiKey;
 
   /**
    * Construct a Sender instance.
    *
-   * @param apiKey Your application's GCM API key.
    */
-  public Sender(String apiKey) {
-    this(apiKey, 10);
+  public Sender() {
+    this(10);
   }
 
   /**
    * Construct a Sender instance with a specified retry count.
    *
-   * @param apiKey Your application's GCM API key.
    * @param retryCount The number of retries to attempt on a network error or 500 response.
    */
-  public Sender(String apiKey, int retryCount) {
-    this(apiKey, retryCount, PRODUCTION_URL);
+  public Sender(int retryCount) {
+    this(retryCount, PRODUCTION_URL);
   }
 
   @VisibleForTesting
-  public Sender(String apiKey, int retryCount, String url) {
+  public Sender(int retryCount, String url) {
     ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
 
     this.url                 = url;
-    this.authorizationHeader = String.format("Bearer %s", apiKey);
+    this.authorizationHeader = String.format("Bearer %s", this.apiKey);
 
     this.client = HttpAsyncClients.custom()
                                   .setMaxConnTotal(100)
@@ -142,6 +141,15 @@ public class Sender {
    */
   public void stop() throws IOException {
     this.client.close();
+  }
+
+  /**
+   * Set API key for Firebase messaging
+   *
+   * @param key apiKey.
+   */
+  public void setApiToken(String key) {
+    this.apiKey = key;
   }
 
   private static final class ResponseHandler implements FutureCallback<HttpResponse> {
