@@ -33,6 +33,13 @@ public class Result {
     this.error                   = error;
   }
 
+  Result(Object context, String messageId, String error) {
+    this.context                 = context;
+    this.messageId               = messageId;
+    this.error                   = error;
+    this.canonicalRegistrationId = null;
+  }
+
   /**
    * Returns the "canonical" GCM registration ID for this destination.
    * See GCM documentation for details.
@@ -74,21 +81,21 @@ public class Result {
    * @return If the destination GCM registration ID is no longer registered.
    */
   public boolean isUnregistered() {
-    return "NotRegistered".equals(error);
+    return "UNREGISTERED".equals(error);
   }
 
   /**
    * @return If messages to this device are being throttled.
    */
   public boolean isThrottled() {
-    return "DeviceMessageRateExceeded".equals(error);
+    return "QUOTA_EXCEEDED".equals(error);
   }
 
   /**
    * @return If the destination GCM registration ID is invalid.
    */
   public boolean isInvalidRegistrationId() {
-    return "InvalidRegistration".equals(error);
+    return "SENDER_ID_MISMATCH".equals(error);
   }
 
   /**

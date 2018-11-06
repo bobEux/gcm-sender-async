@@ -18,6 +18,7 @@ package org.whispersystems.gcm.server;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import org.whispersystems.gcm.server.internal.GcmRequestEntity;
 
 import java.util.HashMap;
@@ -29,32 +30,27 @@ public class Message {
 
   private static final ObjectMapper objectMapper = new ObjectMapper();
 
-  private final String              collapseKey;
-  private final Long                ttl;
-  private final Boolean             delayWhileIdle;
   private final Map<String, String> data;
-  private final List<String>        registrationIds;
-  private final String              priority;
+  private final String              token;
   private final Map<String, String> notification;
+  private final String              android;
+  private final String              apns;
 
-  private Message(String collapseKey, Long ttl, Boolean delayWhileIdle,
-                  Map<String, String> data, List<String> registrationIds,
-                  String priority, Map<String, String> notification)
+  private Message(Map<String, String> data, String token,
+                  Map<String, String> notification,
+                  String android, String apns)
   {
-    this.collapseKey     = collapseKey;
-    this.ttl             = ttl;
-    this.delayWhileIdle  = delayWhileIdle;
     this.data            = data;
-    this.registrationIds = registrationIds;
-    this.priority        = priority;
+    this.token           = token;
     this.notification    = notification;
+    this.android         = android;
+    this.apns            = apns;
   }
 
   public String serialize() throws JsonProcessingException {
-    GcmRequestEntity requestEntity = new GcmRequestEntity(collapseKey, ttl, delayWhileIdle,
-                                                          data, registrationIds, priority, notification);
+    GcmRequestEntity requestEntity = new GcmRequestEntity(data, token, notification, android, apns);
 
-    return objectMapper.writeValueAsString(requestEntity);
+    return objectMapper.enable(SerializationFeature.WRAP_ROOT_VALUE).writeValueAsString(requestEntity);
   }
 
   /**
@@ -67,42 +63,13 @@ public class Message {
 
   public static class Builder {
 
-    private String              collapseKey     = null;
-    private Long                ttl             = null;
-    private Boolean             delayWhileIdle  = null;
     private Map<String, String> data            = null;
-    private List<String>        registrationIds = new LinkedList<>();
-    private String              priority        = null;
+    private String              token           = null;
     private Map<String, String> notification    = null;
+    private String              android         = null;
+    private String              apns            = null;
 
     private Builder() {}
-
-    /**
-     * @param collapseKey The GCM collapse key to use (optional).
-     * @return The Builder.
-     */
-    public Builder withCollapseKey(String collapseKey) {
-      this.collapseKey = collapseKey;
-      return this;
-    }
-
-    /**
-     * @param seconds The TTL (in seconds) for this message (optional).
-     * @return The Builder.
-     */
-    public Builder withTtl(long seconds) {
-      this.ttl = seconds;
-      return this;
-    }
-
-    /**
-     * @param delayWhileIdle Set GCM delay_while_idle (optional).
-     * @return The Builder.
-     */
-    public Builder withDelayWhileIdle(boolean delayWhileIdle) {
-      this.delayWhileIdle = delayWhileIdle;
-      return this;
-    }
 
     /**
      * Set a key in the GCM JSON payload delivered to the application (optional).
@@ -124,20 +91,7 @@ public class Message {
      * @return The Builder.
      */
     public Builder withDestination(String registrationId) {
-      this.registrationIds.clear();
-      this.registrationIds.add(registrationId);
-      return this;
-    }
-
-    /**
-     * Set the GCM message priority (optional).
-     *
-     * @param priority Valid values are "normal" and "high."
-     *                 On iOS, these correspond to APNs priority 5 and 10.
-     * @return The Builder.
-     */
-    public Builder withPriority(String priority) {
-      this.priority = priority;
+      this.token = registrationId;
       return this;
     }
 
@@ -156,16 +110,35 @@ public class Message {
     }
 
     /**
+     * Set a key in the GCM JSON android payload delivered to the application (optional).
+     * @return The Builder.
+     */
+    public Builder withAndroid(String android) {
+      this.android = android;
+      return this;
+    }
+
+    /**
+     * Set a key in the GCM JSON APNS (Apple Push Notification Service) payload delivered to the application (optional).
+     * @param apns The value to set.
+     * @return The Builder.
+     */
+    public Builder withApns(String apns) {
+      this.apns = apns;
+      return this;
+    }
+
+    /**
      * Construct a message object.
      *
      * @return An immutable message object, as configured by this builder.
      */
     public Message build() {
-      if (registrationIds.isEmpty()) {
+      if (token.isEmpty()) {
         throw new IllegalArgumentException("You must specify a destination!");
       }
 
-      return new Message(collapseKey, ttl, delayWhileIdle, data, registrationIds, priority, notification);
+      return new Message(data, token, notification, android, apns);
     }
 
   }

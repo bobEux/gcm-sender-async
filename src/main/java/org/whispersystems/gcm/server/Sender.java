@@ -42,6 +42,7 @@ import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeoutException;
+import java.util.logging.Logger;
 
 /**
  * The main interface to sending GCM messages.  Thread safe.
@@ -50,7 +51,7 @@ import java.util.concurrent.TimeoutException;
  */
 public class Sender {
 
-  private static final String PRODUCTION_URL = "https://android.googleapis.com/gcm/send";
+  private static final String PRODUCTION_URL = "https://fcm.googleapis.com/fcm/send";
 
   private final CloseableHttpAsyncClient client;
   private final String                   authorizationHeader;
@@ -81,7 +82,7 @@ public class Sender {
     ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
 
     this.url                 = url;
-    this.authorizationHeader = String.format("key=%s", apiKey);
+    this.authorizationHeader = String.format("Bearer %s", apiKey);
 
     this.client = HttpAsyncClients.custom()
                                   .setMaxConnTotal(100)
@@ -124,6 +125,7 @@ public class Sender {
         HttpPost               request = new HttpPost(url);
 
         request.setHeader("Authorization", authorizationHeader);
+        request.setHeader("Content-Type", "application/json; UTF-8");
         request.setEntity(new StringEntity(message.serialize(),
                                            ContentType.parse("application/json")));
 
@@ -186,19 +188,13 @@ public class Sender {
     }
 
     private Result parseResult(String body) throws IOException {
-      List<GcmResponseEntity> responseList = objectMapper.readValue(body, GcmResponseListEntity.class)
-                                                         .getResults();
+      GcmResponseEntity responseEntity = objectMapper.readValue(body, GcmResponseEntity.class);
 
-      if (responseList == null || responseList.size() == 0) {
+      if (responseEntity == null || (responseEntity.getName() == null && responseEntity.getError() == null )) {
         throw new IOException("Empty response list!");
       }
 
-      GcmResponseEntity responseEntity = responseList.get(0);
-
-      return new Result(this.requestContext,
-                        responseEntity.getCanonicalRegistrationId(),
-                        responseEntity.getMessageId(),
-                        responseEntity.getError());
+      return new Result(this.requestContext, responseEntity.getName(), responseEntity.getError());
     }
   }
 }

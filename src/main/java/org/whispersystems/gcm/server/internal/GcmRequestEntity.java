@@ -17,46 +17,38 @@
 package org.whispersystems.gcm.server.internal;
 
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.*;
+import com.fasterxml.jackson.databind.util.JSONPObject;
 
 import java.util.List;
 import java.util.Map;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonRootName(value = "message")
 public class GcmRequestEntity {
-
-  @JsonProperty(value = "collapse_key")
-  private String collapseKey;
-
-  @JsonProperty(value = "time_to_live")
-  private Long ttl;
-
-  @JsonProperty(value = "delay_while_idle")
-  private Boolean delayWhileIdle;
-
   @JsonProperty(value = "data")
   private Map<String, String> data;
 
-  @JsonProperty(value = "registration_ids")
-  private List<String> registrationIds;
-
-  @JsonProperty
-  private String priority;
+  @JsonProperty(value = "token")
+  private String token;
 
   @JsonProperty(value = "notification")
   private Map<String, String> notification;
 
-  public GcmRequestEntity(String collapseKey, Long ttl, Boolean delayWhileIdle,
-                          Map<String, String> data, List<String> registrationIds,
-                          String priority, Map<String, String> notification)
+  @JsonRawValue
+  private String android;
+
+  @JsonRawValue
+  private String apns;
+
+  public GcmRequestEntity(Map<String, String> data, String token,
+                          Map<String, String> notification,
+                          String android, String apns)
   {
-    this.collapseKey     = collapseKey;
-    this.ttl             = ttl;
-    this.delayWhileIdle  = delayWhileIdle;
     this.data            = data;
-    this.registrationIds = registrationIds;
-    this.priority        = priority;
+    this.token           = token;
     this.notification    = notification;
+    this.android         = android;
+    this.apns            = apns;
   }
 }

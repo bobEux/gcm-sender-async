@@ -1,3 +1,9 @@
 {
-  "registration_ids" : ["1"]
+  "message": {
+    "token" : "1",
+    "notification" : {
+      "title": "title",
+      "body": "body"
+    }
+  }
 }
