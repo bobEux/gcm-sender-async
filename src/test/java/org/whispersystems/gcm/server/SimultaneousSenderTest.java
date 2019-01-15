@@ -31,7 +31,7 @@ public class SimultaneousSenderTest {
                                 .withStatus(200)
                                 .withBody(fixture("fixtures/response-success.json"))));
 
-    Sender                         sender  = new Sender("foobarbaz", 2, "http://localhost:8089/gcm/send");
+    Sender                         sender  = new Sender(2, "http://localhost:8089/gcm/send");
     List<ListenableFuture<Result>> results = new LinkedList<>();
 
     for (int i=0;i<1000;i++) {
@@ -55,7 +55,7 @@ public class SimultaneousSenderTest {
                 .willReturn(aResponse()
                                 .withStatus(503)));
 
-    Sender                         sender  = new Sender("foobarbaz", 2, "http://localhost:8089/gcm/send");
+    Sender                         sender  = new Sender(2, "http://localhost:8089/gcm/send");
     List<ListenableFuture<Result>> futures = new LinkedList<>();
 
     for (int i=0;i<1000;i++) {

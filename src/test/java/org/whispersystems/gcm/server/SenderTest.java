@@ -29,7 +29,8 @@ public class SenderTest {
     server.enqueue(successResponse);
 
     String                   context = "my context";
-    Sender                   sender  = new Sender("foobarbaz", 10, server.getUrl("/gcm/send").toExternalForm());
+    Sender                   sender  = new Sender(10, server.getUrl("/gcm/send").toExternalForm());
+    sender.setApiKey("foobarbaz");
     ListenableFuture<Result> future  = sender.send(Message.newBuilder()
             .withNotificationPart("title", "title")
             .withNotificationPart("body", "body")
@@ -59,7 +60,8 @@ public class SenderTest {
     MockResponse unauthorizedResponse = new MockResponse().setResponseCode(401);
     server.enqueue(unauthorizedResponse);
 
-    Sender                   sender = new Sender("foobar", 10, server.getUrl("/gcm/send").toExternalForm());
+    Sender                   sender = new Sender( 10, server.getUrl("/gcm/send").toExternalForm());
+    sender.setApiKey("blabla");
     ListenableFuture<Result> future = sender.send(Message.newBuilder().withDestination("1").build());
 
     try {
@@ -77,7 +79,7 @@ public class SenderTest {
     MockResponse malformed = new MockResponse().setResponseCode(400);
     server.enqueue(malformed);
 
-    Sender                   sender = new Sender("foobarbaz", 10, server.getUrl("/gcm/send").toExternalForm());
+    Sender                   sender = new Sender(10, server.getUrl("/gcm/send").toExternalForm());
     ListenableFuture<Result> future = sender.send(Message.newBuilder().withDestination("1").build());
 
     try {
@@ -97,7 +99,7 @@ public class SenderTest {
     server.enqueue(error);
     server.enqueue(error);
 
-    Sender sender = new Sender("foobarbaz", 2, server.getUrl("/gcm/send").toExternalForm());
+    Sender sender = new Sender(2, server.getUrl("/gcm/send").toExternalForm());
     ListenableFuture<Result> future = sender.send(Message.newBuilder().withDestination("1").build());
 
     try {
@@ -122,7 +124,7 @@ public class SenderTest {
     server.enqueue(error);
     server.enqueue(success);
 
-    Sender sender = new Sender("foobarbaz", 3, server.getUrl("/gcm/send").toExternalForm());
+    Sender sender = new Sender(3, server.getUrl("/gcm/send").toExternalForm());
     ListenableFuture<Result> future = sender.send(Message.newBuilder().withDestination("1").build());
 
     Result result = future.get(10, TimeUnit.SECONDS);
@@ -145,7 +147,7 @@ public class SenderTest {
     server.enqueue(response);
     server.enqueue(response);
 
-    Sender sender = new Sender("foobarbaz", 2, server.getUrl("/gcm/send").toExternalForm());
+    Sender sender = new Sender(2, server.getUrl("/gcm/send").toExternalForm());
 
     server.get().shutdown();
 
@@ -165,7 +167,7 @@ public class SenderTest {
 
     server.enqueue(response);
 
-    Sender                   sender = new Sender("foobarbaz", 2, server.getUrl("/gcm/send").toExternalForm());
+    Sender                   sender = new Sender(2, server.getUrl("/gcm/send").toExternalForm());
     ListenableFuture<Result> future = sender.send(Message.newBuilder()
                                                          .withDestination("2")
                                                          .withNotificationPart("title", "title")

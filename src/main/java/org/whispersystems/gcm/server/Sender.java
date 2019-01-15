@@ -54,36 +54,32 @@ public class Sender {
   private static final String PRODUCTION_URL = "https://fcm.googleapis.com/fcm/send";
 
   private final CloseableHttpAsyncClient client;
-  private final String                   authorizationHeader;
   private final RetryExecutor            executor;
   private final String                   url;
+  private       String                   apiKey;
 
   /**
    * Construct a Sender instance.
    *
-   * @param apiKey Your application's GCM API key.
    */
-  public Sender(String apiKey) {
-    this(apiKey, 10);
+  public Sender() {
+    this(10);
   }
 
   /**
    * Construct a Sender instance with a specified retry count.
    *
-   * @param apiKey Your application's GCM API key.
    * @param retryCount The number of retries to attempt on a network error or 500 response.
    */
-  public Sender(String apiKey, int retryCount) {
-    this(apiKey, retryCount, PRODUCTION_URL);
+  public Sender(int retryCount) {
+    this(retryCount, PRODUCTION_URL);
   }
 
   @VisibleForTesting
-  public Sender(String apiKey, int retryCount, String url) {
+  public Sender(int retryCount, String url) {
     ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
 
     this.url                 = url;
-    this.authorizationHeader = String.format("Bearer %s", apiKey);
-
     this.client = HttpAsyncClients.custom()
                                   .setMaxConnTotal(100)
                                   .setMaxConnPerRoute(10)
@@ -124,7 +120,7 @@ public class Sender {
         SettableFuture<Result> future  = SettableFuture.create();
         HttpPost               request = new HttpPost(url);
 
-        request.setHeader("Authorization", authorizationHeader);
+        request.setHeader("Authorization", String.format("Bearer %s", apiKey));
         request.setHeader("Content-Type", "application/json; UTF-8");
         request.setEntity(new StringEntity(message.serialize(),
                                            ContentType.parse("application/json")));
@@ -142,6 +138,15 @@ public class Sender {
    */
   public void stop() throws IOException {
     this.client.close();
+  }
+
+  /**
+   * Set API key for Firebase messaging
+   *
+   * @param key apiKey.
+   */
+  public void setApiKey(String key) {
+    this.apiKey = key;
   }
 
   private static final class ResponseHandler implements FutureCallback<HttpResponse> {
