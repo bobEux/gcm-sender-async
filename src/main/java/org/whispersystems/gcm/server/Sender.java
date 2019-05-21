@@ -175,7 +175,7 @@ public class Sender {
           case 401: future.setException(new AuthenticationFailedException()); break;
           case 204:
           case 200: future.set(parseResult(responseBody));                    break;
-          default:  future.setException(new ServerFailedException("Bad status: " + result.getStatusLine().getStatusCode() " " + + result.getStatusLine().getReasonPhrase()));
+          default:  future.setException(new ServerFailedException("Bad status: " + result.getStatusLine().getStatusCode() + " " + result.getStatusLine().getReasonPhrase()));
         }
       } catch (IOException e) {
         future.setException(e);
